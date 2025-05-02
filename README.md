@@ -17,7 +17,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-x_client_transaction = { git = "https://github.com/langkor/x-client-transaction" }
+x_client_transaction = "0.1"
 ```
 
 ## Usage

@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2021"
 description = "A Rust implementation of the X Client Transaction library"
 authors = ["Langkor <langkor@outlook.com>"]
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/langkor/x-client-transaction"
 
 [dependencies]
 reqwest = { version = "0.12.15", features = ["blocking", "cookies"] }
@@ -15,7 +18,6 @@ sha2 = "0.10.9"
 lazy_static = "1.5.0"
 thiserror = "2.0.12"
 url = "2.5.4"
-tokio = { version = "1.44.2", features = ["macros", "rt-multi-thread"] }
 
 [lib]
 name = "x_client_transaction"
