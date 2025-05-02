@@ -50,7 +50,7 @@ impl ClientTransaction {
         let html_content = home_page.html();
         let on_demand_file = ON_DEMAND_FILE_REGEX
             .captures(&html_content)
-            .ok_or_else(|| Error::ParseError("Couldn't find ondemand file".into()))?;
+            .ok_or_else(|| Error::Parse("Couldn't find ondemand file".into()))?;
 
         let on_demand_file_url = format!(
             "https://abs.twimg.com/responsive-web/client-web/ondemand.s.{}a.js",
@@ -71,7 +71,7 @@ impl ClientTransaction {
         }
 
         if key_byte_indices.is_empty() {
-            return Err(Error::ParseError("Couldn't get KEY_BYTE indices".into()));
+            return Err(Error::Parse("Couldn't get KEY_BYTE indices".into()));
         }
 
         Ok((key_byte_indices[0], key_byte_indices[1..].to_vec()))
@@ -110,7 +110,7 @@ impl ClientTransaction {
 
         let frame_index = (key_bytes[5] % 4) as usize;
         if frame_index >= frames.len() {
-            return Err(Error::ParseError("Invalid frame index".into()));
+            return Err(Error::Parse("Invalid frame index".into()));
         }
 
         let frame = frames[frame_index];
@@ -118,24 +118,24 @@ impl ClientTransaction {
         let mut outer_children = frame.children();
         let first_child = outer_children
             .next()
-            .ok_or_else(|| Error::ParseError("No first child in frame".into()))?;
+            .ok_or_else(|| Error::Parse("No first child in frame".into()))?;
         let first_child = scraper::ElementRef::wrap(first_child)
-            .ok_or_else(|| Error::ParseError("First child is not an element".into()))?;
+            .ok_or_else(|| Error::Parse("First child is not an element".into()))?;
 
         let mut inner_children = first_child.children();
         let path_node = inner_children
             .nth(1)
-            .ok_or_else(|| Error::ParseError("No second child in an inner group".into()))?;
+            .ok_or_else(|| Error::Parse("No second child in an inner group".into()))?;
         let path_elem = scraper::ElementRef::wrap(path_node)
-            .ok_or_else(|| Error::ParseError("Second child is not an element".into()))?;
+            .ok_or_else(|| Error::Parse("Second child is not an element".into()))?;
 
         let d_attr = path_elem
             .value()
             .attr("d")
-            .ok_or_else(|| Error::ParseError("Missing 'd' attribute".into()))?;
+            .ok_or_else(|| Error::Parse("Missing 'd' attribute".into()))?;
         let d_content = d_attr
             .get(9..)
-            .ok_or_else(|| Error::ParseError("Path data too short".into()))?;
+            .ok_or_else(|| Error::Parse("Path data too short".into()))?;
 
         let segments = d_content.split('C');
 
@@ -242,7 +242,7 @@ impl ClientTransaction {
         let arr = Self::get_2d_array(key_bytes, page, None)?;
 
         if row_index_value >= arr.len() {
-            return Err(Error::ParseError("Invalid row index".into()));
+            return Err(Error::Parse("Invalid row index".into()));
         }
 
         let frame_row = &arr[row_index_value];
