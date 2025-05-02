@@ -76,9 +76,13 @@ pub fn is_odd(num: i32) -> f64 {
 }
 
 /// Round a number in JavaScript style (ROUND_HALF_UP)
-pub fn js_round(num: f64, digits: i32) -> f64 {
-    let factor = 10.0_f64.powi(digits);
-    (num * factor).round() / factor
+pub fn js_round(num: f64) -> f64 {
+    let decimal_part = num - num.trunc();
+    if decimal_part == -0.5 {
+        num.ceil()
+    } else {
+        num.round()
+    }
 }
 
 /// Convert a float to a hexadecimal string
@@ -156,10 +160,17 @@ mod tests {
 
     #[test]
     fn test_js_round() {
-        assert_eq!(js_round(1.5, 0), 2.0);
-        assert_eq!(js_round(2.5, 0), 3.0);
-        assert_eq!(js_round(1.23456, 2), 1.23);
-        assert_eq!(js_round(1.23556, 2), 1.24);
+        assert_eq!(js_round(0.0), 0.0);
+        assert_eq!(js_round(0.4), 0.0);
+        assert_eq!(js_round(0.5), 1.0);
+        assert_eq!(js_round(0.6), 1.0);
+        assert_eq!(js_round(1.5), 2.0);
+
+        assert_eq!(js_round(-0.0), 0.0);
+        assert_eq!(js_round(-0.4), 0.0);
+        assert_eq!(js_round(-0.5), -0.0);
+        assert_eq!(js_round(-0.6), -1.0);
+        assert_eq!(js_round(-1.5), -1.0);
     }
 
     #[test]

@@ -237,7 +237,7 @@ impl ClientTransaction {
             .map(|&index| (key_bytes[index] % 16) as f64)
             .fold(1.0, |acc, val| acc * val);
 
-        let frame_time = js_round(frame_time / 10.0, 0) * 10.0;
+        let frame_time = js_round(frame_time / 10.0) * 10.0;
 
         let arr = Self::get_2d_array(key_bytes, page, None)?;
 
