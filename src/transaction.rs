@@ -14,7 +14,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 lazy_static! {
     static ref ON_DEMAND_FILE_REGEX: Regex =
-        Regex::new(r#"['|\"]ondemand\.s['|\"]:\s*['|\"]([\w]*)['|\"]"#).unwrap();
+        Regex::new(r#",(\d+):["']ondemand\.s["']"#).unwrap();
     static ref INDICES_REGEX: Regex = Regex::new(r"(\(\w{1}\[(\d{1,2})\],\s*16\))+").unwrap();
 }
 
@@ -48,13 +48,23 @@ impl ClientTransaction {
 
         // Find ondemand file
         let html_content = home_page.html();
-        let on_demand_file = ON_DEMAND_FILE_REGEX
+        let on_demand_file_index = ON_DEMAND_FILE_REGEX
             .captures(&html_content)
-            .ok_or_else(|| Error::Parse("Couldn't find ondemand file".into()))?;
+            .ok_or_else(|| Error::Parse("Couldn't find ondemand file index".into()))?
+            .get(1)
+            .unwrap()
+            .as_str();
+
+        let regex = Regex::new(&format!("{}:\"([0-9a-f]+)\"", on_demand_file_index)).unwrap();
+        let on_demand_file_name = regex.captures(&html_content)
+            .ok_or_else(|| Error::Parse("Couldn't find ondemand file name".into()))?
+            .get(1)
+            .unwrap()
+            .as_str();
 
         let on_demand_file_url = format!(
             "https://abs.twimg.com/responsive-web/client-web/ondemand.s.{}a.js",
-            on_demand_file.get(1).unwrap().as_str()
+            on_demand_file_name
         );
 
         // Fetch ondemand file
