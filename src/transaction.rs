@@ -3,7 +3,7 @@ use crate::error::Error;
 use crate::interpolate::interpolate;
 use crate::rotation::convert_rotation_to_matrix;
 use crate::utils::{
-    base64_decode, base64_encode, float_to_hex, handle_x_migration, is_odd, js_round,
+    base64_decode, base64_encode, float_to_hex, is_odd, js_round,
 };
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -27,13 +27,14 @@ pub struct ClientTransaction {
 
 impl ClientTransaction {
     pub fn new(client: &Client) -> Result<Self, Error> {
-        let home_page = handle_x_migration(client)?;
+        let response = client.get("https://x.com/i/jf/").send()?;
+        let router_html = Html::parse_document(&response.text()?);
 
-        let (row_index, key_bytes_indices) = Self::get_indices(&home_page, client)?;
-        let key = Self::get_key(&home_page)?;
+        let (row_index, key_bytes_indices) = Self::get_indices(&router_html, client)?;
+        let key = Self::get_key(&router_html)?;
         let key_bytes = Self::get_key_bytes(&key)?;
         let animation_key =
-            Self::get_animation_key(&key_bytes, &home_page, row_index, &key_bytes_indices)?;
+            Self::get_animation_key(&key_bytes, &router_html, row_index, &key_bytes_indices)?;
 
         Ok(Self {
             additional_random_number: 3,
